@@ -3,24 +3,37 @@ from cvzone.HandTrackingModule import HandDetector
 from cvzone.ClassificationModule import Classifier
 import numpy as np
 import math
-import controller as cnt
+import streamlit as st
+#import controller as cnt
 
 
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 detector = HandDetector(maxHands=1)
-classifier = Classifier("D:\\JBPY\\PyProBaseDir01\\venv\\Scripts\\converted_keras\\keras_model.h5", "D:\\JBPY\\PyProBaseDir01\\venv\\Scripts\\converted_keras\\labels.txt")
+classifier = Classifier("G:\\Git\\Git\\SignLanguageDetection\\converted_keras\\keras_model.h5", "G:\\Git\\Git\\SignLanguageDetection\\converted_keras\\labels.txt")
 
 offset = 20
 imgSize = 300
 
 folder = "Data/C"
-3
+
 
 counter = 0
 
 labels = ["A", "B", "C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
+col1, col2 = st.columns([1,1])
+with col1:
+    start_button_pressed = st.button("Start")
+    if start_button_pressed:
+        st.write("Starting Stream")
+with col1:
+    stop_button_pressed = st.button("Stop")
+    if stop_button_pressed:
+        st.write("Ending Stream")
+frame_placeholder = st.empty()
+
 
 while True:
+
     success, img = cap.read()
     imgOutput = img.copy()
     hands, img = detector.findHands(img)
@@ -60,10 +73,14 @@ while True:
                       (x + w+offset, y + h+offset), (255, 0, 255), 4)
 
         #0cnt.show_text(labels[index])
-        cv2.imshow("ImageCrop", imgCrop)
-        cv2.imshow("ImageWhite", imgWhite)
+        #cv2.imshow("ImageCrop", imgCrop)
+        #cv2.imshow("ImageWhite", imgWhite)
 
-    cv2.imshow("Image", imgOutput)
+    #cv2.imshow("Image", imgOutput)
+    if start_button_pressed:
+        frame_placeholder.image(imgOutput, channels="BGR")
+        if stop_button_pressed or cv2.waitKey(1):
+            cv2.destroyAllWindows()
 
 
-    cv2.waitKey(1)
+
