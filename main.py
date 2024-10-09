@@ -9,7 +9,7 @@ import streamlit as st
 
 cap = cv2.VideoCapture(0)
 detector = HandDetector(maxHands=1)
-classifier = Classifier("G:\\Git\\Git\\SignLanguageDetection\\converted_keras\\keras_model.h5", "G:\\Git\\Git\\SignLanguageDetection\\converted_keras\\labels.txt")
+classifier = Classifier("https://github.com/VMOnGit/SignLanguageDetection/blob/main/converted_keras/keras_model.h5", "https://github.com/VMOnGit/SignLanguageDetection/blob/main/converted_keras/labels.txt")
 
 offset = 20
 imgSize = 300
