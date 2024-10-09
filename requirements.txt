@@ -1,4 +1,4 @@
-opencv-python 4.10.0.84
+opencv-python 
 tensorflow 2.15.1
 cvzone 1.6.1
 mediapipe 0.10.15
