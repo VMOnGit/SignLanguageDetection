@@ -3,10 +3,10 @@ from cvzone.HandTrackingModule import HandDetector
 from cvzone.ClassificationModule import Classifier
 import numpy as np
 import math
-import streamlit as st
-#import controller as cnt
 
 
+global arr
+arr = []
 cap = cv2.VideoCapture(0)
 detector = HandDetector(maxHands=1)
 classifier = Classifier("G:\\Git\\Git\\SignLanguageDetection\\converted_keras\\keras_model.h5", "G:\\Git\\Git\\SignLanguageDetection\\converted_keras\\labels.txt")
@@ -14,29 +14,14 @@ classifier = Classifier("G:\\Git\\Git\\SignLanguageDetection\\converted_keras\\k
 offset = 20
 imgSize = 300
 
-folder = "Data/C"
-
-
-counter = 0
-
 labels = ["A", "B", "C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
-col1, col2 = st.columns([1,1])
-with col1:
-    start_button_pressed = st.button("Start")
-    if start_button_pressed:
-        st.write("Starting Stream")
-with col1:
-    stop_button_pressed = st.button("Stop")
-    if stop_button_pressed:
-        st.write("Ending Stream")
-frame_placeholder = st.empty()
-
 
 while True:
 
     success, img = cap.read()
     imgOutput = img.copy()
     hands, img = detector.findHands(img)
+
     if hands:
         hand = hands[0]
         x, y, w, h = hand['bbox']
@@ -45,8 +30,9 @@ while True:
         imgCrop = img[y - offset:y + h + offset, x - offset:x + w + offset]
 
         imgCropShape = imgCrop.shape
-
+        global index
         aspectRatio = h / w
+
         if aspectRatio > 1:
             k = imgSize / h
             wCal = math.ceil(k * w)
@@ -55,7 +41,8 @@ while True:
             wGap = math.ceil((imgSize - wCal) / 2)
             imgWhite[:, wGap:wCal + wGap] = imgResize
             prediction, index = classifier.getPrediction(imgWhite, draw=False)
-            print(prediction, index)
+
+            #print(prediction, index)
 
         else:
             k = imgSize / w
@@ -68,19 +55,24 @@ while True:
 
         cv2.rectangle(imgOutput, (x - offset, y - offset-50),
                       (x - offset+90, y - offset-50+50), (255, 0, 255), cv2.FILLED)
-        cv2.putText(imgOutput, labels[index], (x, y -26), cv2.FONT_HERSHEY_COMPLEX, 1.7, (255, 255, 255), 2)
+        cv2.putText(imgOutput, labels[index] , (x, y -26), cv2.FONT_HERSHEY_COMPLEX, 1.7, (255, 255, 255), 2)
         cv2.rectangle(imgOutput, (x-offset, y-offset),
                       (x + w+offset, y + h+offset), (255, 0, 255), 4)
 
-        #0cnt.show_text(labels[index])
+        #cv2.show_text(labels[index])
         #cv2.imshow("ImageCrop", imgCrop)
         #cv2.imshow("ImageWhite", imgWhite)
 
-    #cv2.imshow("Image", imgOutput)
-    if start_button_pressed:
-        frame_placeholder.image(imgOutput, channels="BGR")
-        if stop_button_pressed or cv2.waitKey(1):
-            cv2.destroyAllWindows()
-
-
-
+    cv2.imshow("Image", imgOutput)
+    if cv2.waitKey(33) == ord('a'):
+        arr.append(labels[index])
+        print(arr)
+    elif cv2.waitKey(113) == ord('q'):
+        arr.pop(-1)
+        print(arr)
+    elif cv2.waitKey(115) == ord('s'):
+        arr = []
+    elif cv2.waitKey(1) & 0xFF == 27:
+        break
+    result = ''.join(arr)
+    print(result)
